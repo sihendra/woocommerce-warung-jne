@@ -97,7 +97,7 @@ class WC_Warung_Base extends WC_Shipping_Method {
 
         $rate = array(
             'id'        => $this->id,
-            'label'     => $this->title,
+            'label'     => $this->title .' ('.$total_weight. ' ' .ucwords(esc_attr( get_option('woocommerce_weight_unit' ) )).')',
             'cost'      => $cost
         );
 

@@ -47,7 +47,7 @@ function warung_jne_init() {
 
         $address_fields['billing']['billing_city'] = array(
             'type'		=> 'select',
-            'label'		=> 'City',
+            'label'		=> __('City','woocommerce'),
             'placeholder'	=> 'City',
             'required'	=> true,
             'class'		=> array($form, 'update_totals_on_change'),
@@ -55,11 +55,11 @@ function warung_jne_init() {
             'defaults'	=> array(
                 '' => __( 'Select an option', 'woocommerce' ),
             ),
-            'options'       => array_splice($new_states,0,20)
+            'options'       => array(''=>'Pilih')//array_splice($new_states,0,20)
         );
         $address_fields['shipping']['shipping_city'] = array(
             'type'          => 'select',
-            'label'         => 'City',
+            'label'         => __('City','woocommerce'),
             'placeholder'       => 'City',
             'required'      => true,
             'class'         => array($form, 'update_totals_on_change'),
@@ -67,7 +67,7 @@ function warung_jne_init() {
             'defaults'		 => array(
                 '' => __( 'Select an option', 'woocommerce' ),
             ),
-            'options'       => array_splice($new_states,0,20)
+            'options'       => array(''=>'Pilih')//array_splice($new_states,0,20)
         );
         return $address_fields;
     }
