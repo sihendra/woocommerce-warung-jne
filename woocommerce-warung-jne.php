@@ -30,17 +30,21 @@ function warung_jne_init() {
 
     // -- custom city select
     function billing_jne_free_modified_address_fields($address_fields){
-        $jne_free_states[''] = __( 'Select an option', 'woocommerce' );
-
-        $shipping_cities = get_option( 'woocommerce_jne_free_data' );
-
-        if(isset($shipping_cities) && isset($shipping_cities['cost_data'])) {asort($shipping_cities['cost_data']);}
-
-        if(is_array($shipping_cities['cost_data']) && count($shipping_cities['cost_data']) > 0){
-            foreach($shipping_cities['cost_data'] as $key => $city){
-                $new_states[$key] = $city['city'];
+        // reorder province
+        $newBilling = array();
+        $stateVal = isset($address_fields['billing_state'])?$address_fields['billing_state']:'';
+        $cityVal = isset($address_fields['billing_city'])?$address_fields['billing_city']:'';
+        foreach($address_fields['billing'] as $key => $val) {
+            if ($key == 'billing_city') {
+                $newBilling['billing_state'] = $stateVal;
+            } else if ($key == 'billing_state') {
+                $newBilling['billing_city'] = $cityVal;
+            } else {
+                $newBilling[$key] = $val;
             }
         }
+        //$address_fields['billing'] = $newBilling;
+
 
         $form = 'form-row-wide';
         if($form == 'form-row-wide') $clear = true; else $clear = false;
