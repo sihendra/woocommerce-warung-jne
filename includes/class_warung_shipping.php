@@ -14,15 +14,14 @@ class WC_Warung_Base extends WC_Shipping_Method {
      * @access public
      * @return void
      */
-    public function __construct() {
-        $this->id                 = 'warung_shipping'; // Id for your shipping method. Should be uunique.
-        $this->method_title       = __( 'Warung Shipping' );  // Title shown in admin
-        $this->method_description = __( 'Pengiriman pilihan Warung' ); // Description shown in admin
+    public function __construct()
+    {
+        $this->id = 'warung_shipping'; // Id for your shipping method. Should be uunique.
+        $this->method_title = __('Warung Shipping');  // Title shown in admin
+        $this->method_description = __('Pengiriman pilihan Warung'); // Description shown in admin
 
-        $this->enabled            = "yes"; // This can be added as an setting but for this example its forced enabled
-        $this->title              = "Warung Shipping"; // This can be added as an setting but for this example its forced.
-
-        $this->init();
+        $this->enabled = "yes"; // This can be added as an setting but for this example its forced enabled
+        $this->title = "Warung Shipping"; // This can be added as an setting but for this example its forced.
     }
 
     /**
@@ -44,6 +43,32 @@ class WC_Warung_Base extends WC_Shipping_Method {
         // save file upload
         add_action( 'woocommerce_update_options_shipping_' . $this->id, array( $this, 'process_admin_upload_options' ) );
     }
+
+    public function is_available( $package ) {
+        if ( 'no' == $this->enabled ) {
+            return false;
+        }
+
+        $shipping_classes = $this->settings['shipping_class'];
+        if (empty($shipping_classes)) {
+            return true; // available for all items
+        }
+
+        // if one item not in shipping_class list, just return false
+        foreach ( $package['contents'] as $item_id => $values ) {
+            if ( $values['data']->needs_shipping() ) {
+                $found_class = $values['data']->get_shipping_class();
+
+                if (!in_array($found_class, $shipping_classes)) {
+                    return false;
+                }
+            }
+        }
+
+
+        return apply_filters( 'woocommerce_shipping_' . $this->id . '_is_available', true, $package );
+    }
+
 
     /**
      * calculate_shipping function.
@@ -106,6 +131,14 @@ class WC_Warung_Base extends WC_Shipping_Method {
 
     function init_form_fields() {
 
+        $shipping_classes = WC()->shipping->get_shipping_classes();
+        foreach ( $shipping_classes as $shipping_class ) {
+            if (!isset($shipping_class->slug)) {
+                continue;
+            }
+            $shipping_class_opt[$shipping_class->slug] = $shipping_class->name;
+        }
+
         $this->form_fields = array(
             'enabled' => array(
                 'title'         => __( 'Aktifkan/Non-aktifkan', 'woocommerce' ),
@@ -119,6 +152,13 @@ class WC_Warung_Base extends WC_Shipping_Method {
                 'desc_tip'	=> true,
                 'type'          => 'text',
                 'default'       => __( $this->title, 'woocommerce' ),
+            ),
+            'shipping_class' => array(
+                'title'         => __( 'Shipping Class', 'woocommerce' ),
+                'description' 	=> __( 'Pilih shipping class, atau biarkan kosong jika berlaku untuk semua.', 'woocommerce' ),
+                'desc_tip'	    => true,
+                'type'          => 'multiselect',
+                'options'       => $shipping_class_opt
             ),
             'jne_weight' => array(
                 'title'         => __( 'Berat default', 'woocommerce' ),
