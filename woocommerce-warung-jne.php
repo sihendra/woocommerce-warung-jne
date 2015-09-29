@@ -30,21 +30,9 @@ function warung_jne_init() {
 
     // -- custom city select
     function billing_jne_free_modified_address_fields($address_fields){
-        // reorder province
-        $newBilling = array();
-        $stateVal = isset($address_fields['billing_state'])?$address_fields['billing_state']:'';
-        $cityVal = isset($address_fields['billing_city'])?$address_fields['billing_city']:'';
-        foreach($address_fields['billing'] as $key => $val) {
-            if ($key == 'billing_city') {
-                $newBilling['billing_state'] = $stateVal;
-            } else if ($key == 'billing_state') {
-                $newBilling['billing_city'] = $cityVal;
-            } else {
-                $newBilling[$key] = $val;
-            }
-        }
-        //$address_fields['billing'] = $newBilling;
+        global $woocommerce;
 
+        $selectedCity = $woocommerce->customer->get_shipping_city();
 
         $form = 'form-row-wide';
         if($form == 'form-row-wide') $clear = true; else $clear = false;
@@ -59,7 +47,7 @@ function warung_jne_init() {
             'defaults'	=> array(
                 '' => __( 'Select an option', 'woocommerce' ),
             ),
-            'options'       => array(''=>'Pilih')//array_splice($new_states,0,20)
+            'options'       => !empty($selectedCity)?array($selectedCity=>$selectedCity):array(''=>'Isi Kota/Kecamatan')
         );
         $address_fields['shipping']['shipping_city'] = array(
             'type'          => 'select',
@@ -71,7 +59,7 @@ function warung_jne_init() {
             'defaults'		 => array(
                 '' => __( 'Select an option', 'woocommerce' ),
             ),
-            'options'       => array(''=>'Pilih')//array_splice($new_states,0,20)
+            'options'       => !empty($selectedCity)?array($selectedCity=>$selectedCity):array(''=>'Isi Kota/Kecamatan')
         );
         return $address_fields;
     }
