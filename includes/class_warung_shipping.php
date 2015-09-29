@@ -70,6 +70,7 @@ class WC_Warung_Base extends WC_Shipping_Method {
     }
 
 
+
     /**
      * calculate_shipping function.
      *
@@ -83,17 +84,10 @@ class WC_Warung_Base extends WC_Shipping_Method {
         $this->shipping_total  = 0;
         $this->shipping_tax    = 0;
 
-        $cost = 0;
         $total_weight = 0;
-        $shipping_cities = '';
 
         $city = $woocommerce->customer->get_shipping_city();
-
-        $shipping_cities = get_option( $this->option_name_shipping_data );
-
-        $shipping_price = $shipping_cities['cost_data'][$city];
-
-        $cost = $shipping_price['price'];
+        $cost = $this->get_cost($city);
 
         if($cost == 0) {
             return false;
@@ -233,6 +227,25 @@ class WC_Warung_Base extends WC_Shipping_Method {
         }
     }
 
+    /**
+     * @param $city
+     * @return mixed
+     */
+    public function get_cost($city)
+    {
+        $shipping_cities = get_option($this->option_name_shipping_data);
+
+        if (!isset($shipping_cities['cost_data'])) {
+            return 0;
+        }
+        $shipping_price = $shipping_cities['cost_data'][$city];
+
+        if (!isset($shipping_price['price'])) {
+            return 0;
+        }
+        $cost = $shipping_price['price'];
+        return $cost;
+    }
 
 
 }

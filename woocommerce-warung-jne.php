@@ -85,7 +85,7 @@ add_filter('woocommerce_shipping_methods', 'add_warung_jne_shipping_method' );
 // enqueue plugin scripts
 function warung_shipping_enqueue_script() {
 
-    if ( is_page() ) {
+    //if ( !is_admin() ) {
 
         // init select2 in city select box
         wp_enqueue_script('woocommerce-warung-jne', plugin_dir_url(__FILE__) . 'js/woocommerce-warung-shipping.js', array( 'jquery' ), false, true);
@@ -102,7 +102,7 @@ function warung_shipping_enqueue_script() {
         // register select2 v4
         wp_enqueue_style('select2v4', plugin_dir_url(__FILE__) . 'css/select2.min.css');
         wp_enqueue_script('select2v4', plugin_dir_url(__FILE__) . 'js/select2.full.min.js', array( 'jquery' ), false, true);
-    }
+    //}
 
 }
 add_action( 'wp_enqueue_scripts', 'warung_shipping_enqueue_script', 100 );
@@ -113,6 +113,11 @@ function warung_shipping_ajax_action_callback() {
     $q = strtoupper($_POST['q']);
     $limit = 15;
 
+    // optional params
+    $isCalculatorMode = $_POST['m'] == 'calc';
+
+
+    // Use JNE AS DEFAULT
     $shipping_cities = get_option( 'woocommerce_warung_shipping_jne_reguler_shipping_data' );
     if(isset($shipping_cities) && isset($shipping_cities['cost_data'])) {asort($shipping_cities['cost_data']);}
 
@@ -128,9 +133,47 @@ function warung_shipping_ajax_action_callback() {
         }
     }
 
+    if ($isCalculatorMode) {
+        // loop throug all shipping methods
+        global $woocommerce;
+
+        foreach($new_states as $cities) {
+            if (isset($woocommerce->shipping) && !empty($woocommerce->shipping->shipping_methods)) {
+                foreach ($woocommerce->shipping->shipping_methods as $sm) {
+                    $cost = $sm->get_cost($cities['city']);
+                    $cities["cost"] = $cost;
+                }
+            };
+        }
+    }
+
     echo json_encode((object)array("results"=>$new_states));
 
     wp_die(); // this is required to terminate immediately and return a proper response
 }
 add_action( 'wp_ajax_ongkir', 'warung_shipping_ajax_action_callback' );
 add_action( 'wp_ajax_nopriv_ongkir', 'warung_shipping_ajax_action_callback' );
+
+
+// widget
+function woocommerce_warung_shipping_calculator_shortcode( $atts, $content = null ) {
+
+    $a = shortcode_atts( array(
+        'url'       => '#',
+        'target'    => '_self',
+    ), $atts );
+
+    // Buffer our contents
+    ob_start();
+    ?>
+    <form class="woocommerce_warung_shipping_calculator_form">
+        <label>Kecamatan/Kota <span>*</span></label>
+        <select class="woocommerce_warung_shipping_calculator_city"></select>
+        <button type="submit">Hitung</button>
+    </form>
+    <?php
+    // Return buffered contents
+    return ob_get_clean();
+
+}
+add_shortcode( 'warung_shipping_calculator', 'woocommerce_warung_shipping_calculator_shortcode' );

@@ -70,3 +70,41 @@ jQuery(function($) {
 	}
 
 });
+
+jQuery(document).ready(function($){
+
+    // init autocomplete
+    $(".woocommerce_warung_shipping_calculator_city").select2(
+        {
+            ajax: {
+                method: 'POST',
+                url: ajax_object.ajax_url,
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        q: params.term, // search term
+                        action: 'ongkir',
+                        page: params.page,
+                        m: 'calc'
+                    };
+                },
+                processResults: function (data, page) {
+                    // parse the results into the format expected by Select2.
+                    // since we are using custom formatting functions we do not need to
+                    // alter the remote JSON data
+                    return {
+                        results: data.results
+                    };
+                },
+                cache: false
+            },
+            escapeMarkup: function (markup) { return markup; }, // let our custom formatter work
+            minimumInputLength: 3,
+        }
+    );
+    $('.woocommerce_warung_shipping_calculator_city').on("select2:changed", function(e) {
+        alert(e.choice.text + ' ' + e.choice.price);
+    });
+
+});
