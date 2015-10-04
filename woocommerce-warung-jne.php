@@ -85,7 +85,7 @@ add_filter('woocommerce_shipping_methods', 'add_warung_jne_shipping_method' );
 // enqueue plugin scripts
 function warung_shipping_enqueue_script() {
 
-    //if ( !is_admin() ) {
+    if ( is_page() ) {
 
         // init select2 in city select box
         wp_enqueue_script('woocommerce-warung-jne', plugin_dir_url(__FILE__) . 'js/woocommerce-warung-shipping.js', array( 'jquery' ), false, true);
@@ -102,7 +102,7 @@ function warung_shipping_enqueue_script() {
         // register select2 v4
         wp_enqueue_style('select2v4', plugin_dir_url(__FILE__) . 'css/select2.min.css');
         wp_enqueue_script('select2v4', plugin_dir_url(__FILE__) . 'js/select2.full.min.js', array( 'jquery' ), false, true);
-    //}
+    }
 
 }
 add_action( 'wp_enqueue_scripts', 'warung_shipping_enqueue_script', 100 );
@@ -136,15 +136,21 @@ function warung_shipping_ajax_action_callback() {
     if ($isCalculatorMode) {
         // loop throug all shipping methods
         global $woocommerce;
+        $woocommerce->shipping->load_shipping_methods();
 
-        foreach($new_states as $cities) {
-            if (isset($woocommerce->shipping) && !empty($woocommerce->shipping->shipping_methods)) {
-                foreach ($woocommerce->shipping->shipping_methods as $sm) {
-                    $cost = $sm->get_cost($cities['city']);
-                    $cities["cost"] = $cost;
+        foreach($new_states as &$cities) {
+            foreach ($woocommerce->shipping->shipping_methods as $sm) {
+                if ($sm->enabled) {
+                    if (method_exists($sm, 'get_cost')) {
+                        $cost = $sm->get_cost($cities->text);
+                        $cities->cost[] = array('name'=> $sm->title, 'price'=> $cost);
+                    } else {
+                        //error_log('no get_cost() in ' . $sm->title);
+                    }
                 }
-            };
-        }
+            }
+
+        } unset($cities);
     }
 
     echo json_encode((object)array("results"=>$new_states));
@@ -167,9 +173,11 @@ function woocommerce_warung_shipping_calculator_shortcode( $atts, $content = nul
     ob_start();
     ?>
     <form class="woocommerce_warung_shipping_calculator_form">
-        <label>Kecamatan/Kota <span>*</span></label>
-        <select class="woocommerce_warung_shipping_calculator_city"></select>
-        <button type="submit">Hitung</button>
+        <p class="form-row">
+            <label><strong>Kecamatan/Kota </strong><abbr class="required">*</abbr></label>
+            <select class="woocommerce_warung_shipping_calculator_city"></select>
+        </p>
+        <button type="submit" class="button">Hitung</button>
     </form>
     <?php
     // Return buffered contents

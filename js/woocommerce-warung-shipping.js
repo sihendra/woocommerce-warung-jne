@@ -103,8 +103,32 @@ jQuery(document).ready(function($){
             minimumInputLength: 3,
         }
     );
-    $('.woocommerce_warung_shipping_calculator_city').on("select2:changed", function(e) {
-        alert(e.choice.text + ' ' + e.choice.price);
+
+	function showShippingResult(str) {
+		var $btn = $("form.woocommerce_warung_shipping_calculator_form > button");
+		$btn.prev('.result').remove();
+		$('<div class="result woocommerce-message message-success animated fadeIn">'+str+'</div>').insertBefore($btn);
+	}
+    $('.woocommerce_warung_shipping_calculator_city').on("select2:select", function(e) {
+		var tmpStr = '';
+		var data = e.params.data;
+        var isFound = false;
+        tmpStr = '<ul style="list-style: none" ">';
+		for(var i = 0; i < data.cost.length; i++) {
+			var el = data.cost[i];
+			if (el.price) {
+                isFound = true;
+				tmpStr += "<li>" + el.name + ": " + el.price + "</li>";
+			}
+		}
+        tmpStr += '</ul>';
+
+
+        if (isFound) {
+			showShippingResult(tmpStr);
+		} else {
+			alert('Ongkos kirim tidak tersedia untuk ' + data.closeText);
+		}
     });
 
 });
