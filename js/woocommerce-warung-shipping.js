@@ -129,7 +129,7 @@ jQuery(document).ready(function($){
                         var el = row.cost[i];
                         if (el.price) {
                             isFound = true;
-                            tmpStr += "<li>" + el.name + ": Rp. " + el.price + " (Rp. "+el.pricePerKg+"/Kg)</li>";
+                            tmpStr += "<li>" + el.name + ": <strong>Rp. " + el.price + "</strong> (Rp. "+el.pricePerKg+"/Kg)</li>";
                         }
                     }
                 }
