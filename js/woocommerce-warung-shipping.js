@@ -86,7 +86,6 @@ jQuery(document).ready(function($){
                         q: params.term, // search term
                         action: 'ongkir',
                         page: params.page,
-                        m: 'calc'
                     };
                 },
                 processResults: function (data, page) {
@@ -104,31 +103,49 @@ jQuery(document).ready(function($){
         }
     );
 
-	function showShippingResult(str) {
-		var $btn = $("form.woocommerce_warung_shipping_calculator_form > button");
+	function showShippingResult(container, str) {
+		var $btn = $(container).find("button");
 		$btn.prev('.result').remove();
 		$('<div class="result woocommerce-message message-success">'+str+'</div>').insertBefore($btn);
 	}
-    $('.woocommerce_warung_shipping_calculator_city').on("select2:select", function(e) {
-		var tmpStr = '';
-		var data = e.params.data;
-        var isFound = false;
-        tmpStr = '<ul style="list-style: none" ">';
-		for(var i = 0; i < data.cost.length; i++) {
-			var el = data.cost[i];
-			if (el.price) {
-                isFound = true;
-				tmpStr += "<li>" + el.name + ": " + el.price + "</li>";
-			}
-		}
-        tmpStr += '</ul>';
+
+    $('.woocommerce_warung_shipping_calculator_form').on("submit", function() {
+
+        var formContainer = this;
+        var city = $(formContainer).find(".woocommerce_warung_shipping_calculator_city").val();
+        var weight = $(formContainer).find(".woocommerce_warung_shipping_calculator_weight").val();
+        var params = {action: 'ongkir','m':'calc', 'weight':weight, q: city};
+        $.post(ajax_object.ajax_url, params, function(response){
+            var tmpStr = '';
+            var data = response.results;
+            var isFound = false;
+            tmpStr = '<ul style="list-style: none" ">';
+            console.log(response);
+            console.log(data);
+            if (data && data.length) {
+                var row = data[0];
+                if (row.cost && row.cost.length) {
+                    for(var i = 0; i < row.cost.length; i++) {
+                        var el = row.cost[i];
+                        if (el.price) {
+                            isFound = true;
+                            tmpStr += "<li>" + el.name + ": Rp. " + el.price + " (Rp. "+el.pricePerKg+"/Kg)</li>";
+                        }
+                    }
+                }
+            }
+            tmpStr += '</ul>';
 
 
-        if (isFound) {
-			showShippingResult(tmpStr);
-		} else {
-			alert('Ongkos kirim tidak tersedia untuk ' + data.closeText);
-		}
+            if (isFound) {
+                showShippingResult(formContainer, tmpStr);
+            } else {
+                alert('Ongkos kirim tidak tersedia untuk "' + city+ '"');
+            }
+        });
+
+
+        return false;
     });
 
 });

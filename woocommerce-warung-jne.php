@@ -134,6 +134,11 @@ function warung_shipping_ajax_action_callback() {
     }
 
     if ($isCalculatorMode) {
+        $weight = isset($_POST['weight'])?$_POST['weight']:1;
+        if (!is_numeric($weight)) {
+            $weight = 1;
+        }
+
         // loop throug all shipping methods
         global $woocommerce;
         $woocommerce->shipping->load_shipping_methods();
@@ -142,8 +147,9 @@ function warung_shipping_ajax_action_callback() {
             foreach ($woocommerce->shipping->shipping_methods as $sm) {
                 if ($sm->enabled) {
                     if (method_exists($sm, 'get_cost')) {
-                        $cost = $sm->get_cost($cities->text);
-                        $cities->cost[] = array('name'=> $sm->title, 'price'=> $cost);
+                        $costPerKg = $sm->get_cost($cities->text);
+                        $cost = $costPerKg * $weight;
+                        $cities->cost[] = array('name'=> $sm->title, 'price'=> $cost, 'pricePerKg'=>$costPerKg);
                     } else {
                         //error_log('no get_cost() in ' . $sm->title);
                     }
@@ -155,6 +161,7 @@ function warung_shipping_ajax_action_callback() {
 
     echo json_encode((object)array("results"=>$new_states));
 
+    header('Content-Type: application/json');
     wp_die(); // this is required to terminate immediately and return a proper response
 }
 add_action( 'wp_ajax_ongkir', 'warung_shipping_ajax_action_callback' );
@@ -175,9 +182,13 @@ function woocommerce_warung_shipping_calculator_shortcode( $atts, $content = nul
     <form class="woocommerce_warung_shipping_calculator_form">
         <p class="form-row">
             <label><strong>Kecamatan/Kota </strong><abbr class="required">*</abbr></label>
-            <select class="woocommerce_warung_shipping_calculator_city"></select>
+            <select class="woocommerce_warung_shipping_calculator_city"><option>-- Ketik Kota/Kecamatan --</option></select>
         </p>
-        <button type="submit" class="button">Hitung</button>
+        <p>
+            <label><strong>Berat (Kg)</strong><abbr class="required">*</abbr></label>
+            <input type="text" class="woocommerce_warung_shipping_calculator_weight" name="weight" placeholder="Masukan berat dalam Kg" value="1">
+        </p>
+        <button class="button" type="submit">Hitung</button>
     </form>
     <?php
     // Return buffered contents
