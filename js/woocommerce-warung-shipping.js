@@ -107,7 +107,7 @@ jQuery(document).ready(function($){
 	function showShippingResult(str) {
 		var $btn = $("form.woocommerce_warung_shipping_calculator_form > button");
 		$btn.prev('.result').remove();
-		$('<div class="result woocommerce-message message-success animated fadeIn">'+str+'</div>').insertBefore($btn);
+		$('<div class="result woocommerce-message message-success">'+str+'</div>').insertBefore($btn);
 	}
     $('.woocommerce_warung_shipping_calculator_city').on("select2:select", function(e) {
 		var tmpStr = '';
