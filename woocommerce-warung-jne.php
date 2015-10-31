@@ -111,7 +111,7 @@ add_action( 'wp_enqueue_scripts', 'warung_shipping_enqueue_script', 100 );
 function warung_shipping_ajax_action_callback() {
     // query
     $q = strtoupper($_POST['q']);
-    $limit = 15;
+    $limit = 35;
 
     // optional params
     $isCalculatorMode = $_POST['m'] == 'calc';
