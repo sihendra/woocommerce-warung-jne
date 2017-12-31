@@ -27,6 +27,7 @@ abstract class WC_Warung_Base extends WC_Shipping_Method
         $this->shipping_rate_option_key = $this->plugin_id . $this->id . '_shipping_rate';
 
         $this->title = $this->settings['title'] ? $this->settings['title'] : $this->title ;
+        $this->enabled = isset($this->settings['enabled']) ? $this->settings['enabled'] : $this->enabled;
 
         // default upload handler
         add_action('woocommerce_update_options_shipping_' . $this->id, array($this, 'process_admin_options'));
@@ -118,7 +119,7 @@ abstract class WC_Warung_Base extends WC_Shipping_Method
             ),
             'title' => array(
                 'title' => __('Judul', 'woocommerce'),
-                'description' => __('Tambahkan judul untuk fitur pengiriman kamu.', 'woocommerce'),
+                'description' => __('Nama expedisi, akan ditampilkan saat checkout.', 'woocommerce'),
                 'desc_tip' => true,
                 'type' => 'text',
                 'default' => __($this->title, 'woocommerce'),
@@ -132,10 +133,10 @@ abstract class WC_Warung_Base extends WC_Shipping_Method
             ),
             'min_weight' => array(
                 'title' => __('Berat Minimum', 'woocommerce'),
-                'description' => __('Berat minimum, atau biarkan kosong jika berlaku untuk semua.', 'woocommerce'),
+                'description' => __('Berat minimum, atau biarkan kosong jika tidak ada batas minimum.', 'woocommerce'),
                 'desc_tip' => true,
                 'type' => 'number',
-                'default' => 1,
+                'default' => 0,
                 'custom_attributes' => array(
                     'step' => 'any',
                     'min' => '0'
@@ -143,12 +144,12 @@ abstract class WC_Warung_Base extends WC_Shipping_Method
             ),
             'default_weight' => array(
                 'title' => __('Berat Default', 'woocommerce'),
-                'description' => __('Otomatis setting berat produk jika kamu tidak setting pada masing-masing produk.', 'woocommerce'),
+                'description' => __('Otomatis set berat produk jika berat tidak di-set pada masing-masing produk.', 'woocommerce'),
                 'desc_tip' => true,
                 'type' => 'number',
                 'custom_attributes' => array(
                     'step' => 'any',
-                    'min' => '0'
+                    'min' => '1'
                 ),
                 'placeholder' => '0.00',
                 'default' => '1',
@@ -298,7 +299,6 @@ class WC_Warung_JNE_Reguler extends WC_Warung_Base
         $this->method_title = __('JNE Reguler');  // Title shown in admin
         $this->method_description = __('Pengiriman dengan JNE Reguler'); // Description shown in admin
 
-        $this->enabled = "yes"; // This can be added as an setting but for this example its forced enabled
         $this->title = "JNE Reguler"; // This can be added as an setting but for this example its forced.
 
         $this->init();
@@ -322,7 +322,6 @@ class WC_Warung_JNE_Oke extends WC_Warung_Base
         $this->method_title = __('JNE Oke');  // Title shown in admin
         $this->method_description = __('Pengiriman dengan JNE Oke'); // Description shown in admin
 
-        $this->enabled = "no"; // This can be added as an setting but for this example its forced enabled
         $this->title = "JNE Oke"; // This can be added as an setting but for this example its forced.
 
         $this->init();
@@ -346,7 +345,6 @@ class WC_Warung_JNE_Yes extends WC_Warung_Base
         $this->method_title = __('JNE Yes');  // Title shown in admin
         $this->method_description = __('Pengiriman dengan JNE Yes'); // Description shown in admin
 
-        $this->enabled = "no"; // This can be added as an setting but for this example its forced enabled
         $this->title = "JNE YES"; // This can be added as an setting but for this example its forced.
 
         $this->init();
@@ -370,7 +368,6 @@ class WC_Warung_Tritama extends WC_Warung_Base
         $this->method_title = __('Tritama');  // Title shown in admin
         $this->method_description = __('Pengiriman dengan Tritama'); // Description shown in admin
 
-        $this->enabled = "no"; // This can be added as an setting but for this example its forced enabled
         $this->title = "Tritama"; // This can be added as an setting but for this example its forced.
 
         $this->init();
@@ -393,7 +390,6 @@ class WC_Warung_Wahana extends WC_Warung_Base
         $this->method_title = __('Wahana');  // Title shown in admin
         $this->method_description = __('Pengiriman dengan Wahana'); // Description shown in admin
 
-        $this->enabled = "no"; // This can be added as an setting but for this example its forced enabled
         $this->title = "Wahana"; // This can be added as an setting but for this example its forced.
 
         $this->init();
