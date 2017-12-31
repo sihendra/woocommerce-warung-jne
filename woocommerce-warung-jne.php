@@ -74,6 +74,8 @@ add_action( 'woocommerce_shipping_init', 'warung_jne_init' , 0);
 // register shipping method
 function add_warung_jne_shipping_method( $methods ) {
     $methods[] = 'WC_Warung_JNE_Reguler';
+    $methods[] = 'WC_Warung_JNE_Yes';
+    $methods[] = 'WC_Warung_JNE_Oke';
     $methods[] = 'WC_Warung_Tritama';
     $methods[] = 'WC_Warung_Wahana';
 

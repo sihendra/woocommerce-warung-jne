@@ -26,6 +26,8 @@ abstract class WC_Warung_Base extends WC_Shipping_Method
         // Set shipping_rate key
         $this->shipping_rate_option_key = $this->plugin_id . $this->id . '_shipping_rate';
 
+        $this->title = $this->settings['title'] ? $this->settings['title'] : $this->title ;
+
         // default upload handler
         add_action('woocommerce_update_options_shipping_' . $this->id, array($this, 'process_admin_options'));
         // rate upload handler
@@ -140,7 +142,7 @@ abstract class WC_Warung_Base extends WC_Shipping_Method
                 ),
             ),
             'default_weight' => array(
-                'title' => __('Berat default', 'woocommerce'),
+                'title' => __('Berat Default', 'woocommerce'),
                 'description' => __('Otomatis setting berat produk jika kamu tidak setting pada masing-masing produk.', 'woocommerce'),
                 'desc_tip' => true,
                 'type' => 'number',
@@ -304,6 +306,55 @@ class WC_Warung_JNE_Reguler extends WC_Warung_Base
 
 }
 
+
+class WC_Warung_JNE_Oke extends WC_Warung_Base
+{
+
+    /**
+     * Constructor for your shipping class
+     *
+     * @access public
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->id = 'warung_shipping_jne_oke'; // Id for your shipping method. Should be uunique.
+        $this->method_title = __('JNE Oke');  // Title shown in admin
+        $this->method_description = __('Pengiriman dengan JNE Oke'); // Description shown in admin
+
+        $this->enabled = "no"; // This can be added as an setting but for this example its forced enabled
+        $this->title = "JNE Oke"; // This can be added as an setting but for this example its forced.
+
+        $this->init();
+    }
+
+}
+
+
+class WC_Warung_JNE_Yes extends WC_Warung_Base
+{
+
+    /**
+     * Constructor for your shipping class
+     *
+     * @access public
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->id = 'warung_shipping_jne_yes'; // Id for your shipping method. Should be uunique.
+        $this->method_title = __('JNE Yes');  // Title shown in admin
+        $this->method_description = __('Pengiriman dengan JNE Yes'); // Description shown in admin
+
+        $this->enabled = "no"; // This can be added as an setting but for this example its forced enabled
+        $this->title = "JNE YES"; // This can be added as an setting but for this example its forced.
+
+        $this->init();
+    }
+
+}
+
+
 class WC_Warung_Tritama extends WC_Warung_Base
 {
 
@@ -319,7 +370,7 @@ class WC_Warung_Tritama extends WC_Warung_Base
         $this->method_title = __('Tritama');  // Title shown in admin
         $this->method_description = __('Pengiriman dengan Tritama'); // Description shown in admin
 
-        $this->enabled = "yes"; // This can be added as an setting but for this example its forced enabled
+        $this->enabled = "no"; // This can be added as an setting but for this example its forced enabled
         $this->title = "Tritama"; // This can be added as an setting but for this example its forced.
 
         $this->init();
@@ -342,7 +393,7 @@ class WC_Warung_Wahana extends WC_Warung_Base
         $this->method_title = __('Wahana');  // Title shown in admin
         $this->method_description = __('Pengiriman dengan Wahana'); // Description shown in admin
 
-        $this->enabled = "yes"; // This can be added as an setting but for this example its forced enabled
+        $this->enabled = "no"; // This can be added as an setting but for this example its forced enabled
         $this->title = "Wahana"; // This can be added as an setting but for this example its forced.
 
         $this->init();
