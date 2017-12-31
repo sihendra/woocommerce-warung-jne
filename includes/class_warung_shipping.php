@@ -162,29 +162,34 @@ abstract class WC_Warung_Base extends WC_Shipping_Method
     {
         ob_start();
         $jne_data = get_option($this->shipping_rate_option_key);
+        $data_uploaded = !empty($jne_data['cost_data']);
         ?>
         <tr valign="top">
-            <th scope="row" class="titledesc"><?php _e('Impor Kota', 'woojne') ?> <img class="help_tip"
-                                                                                       data-tip="Masukan file csv untuk menginput data kota kamu."
-                                                                                       src="<?php echo plugins_url('../images/help.png', __FILE__); ?>"
-                                                                                       height="16" width="16"/></th>
+            <th scope="row" class="titledesc"><?php _e('Impor Kota', 'warungjne') ?>
+                <img class="help_tip"
+                     data-tip="Masukan file csv untuk menginput data kota kamu."
+                     src="<?php echo plugins_url('../images/help.png', __FILE__); ?>"
+                     height="16" width="16"/></th>
             <td>
                 <p><input type="file" name="<?php echo $this->plugin_id . $this->id . '_import_city'; ?>"
                           id="<?php echo $this->plugin_id . $this->id . '_import_city'; ?>" style="min-width:393px;"/>
                     <input name="save" class="button-primary help_tip" data-tip="Klik untuk melakukan upload data kota."
                            class="button-primary" type="submit" value="Upload Data Kota">
-                    <a href="#"
-                       class="button-primary help_tip"
-                       data-tip="Silahkan lengkapi form checkout untuk mendapatkan data kota."
-                       target="_blank">Download Data Kota</a>
                 </p>
-                <?php if (!empty($jne_data['cost_data'])) { ?>
+                <?php if ($data_uploaded) { ?>
                     <p style="background: #FFF;  border-left: 4px solid #FFF;  -webkit-box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.1);  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.1);  margin: 5px 0 2px;  padding: 5px 12px;  border-color: #7AD03A;">
-                        Anda telah melakukan upload data, dan jika Anda ingin <u>mengedit data kota</u>, Anda bisa
-                        mengedit file csv terlebih dahulu.</p>
+                        Anda telah melakukan upload data, jika anda ingin <strong>mengedit data kota</strong>, Anda bisa
+                        <a href="<?php echo plugin_dir_url() . '/woocommerce-warung-jne/uploads/' . $this->id . '.csv'; ?>"
+                           class="help_tip"
+                           data-tip="Silahkan lengkapi form checkout untuk mendapatkan data kota."
+                           target="_blank">Download data kota</a> lalu upload kembali file tersebut.</p>
                 <?php } else { ?>
                     <p style="background: #FFF;  border-left: 4px solid #FFF;  -webkit-box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.1);  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.1);  margin: 5px 0 2px;  padding: 5px 12px;  border-color: #D54E21;">
-                        Anda belum melakukan upload data kota.</p>
+                        Anda belum melakukan upload data kota. <a
+                            href="<?php echo plugin_dir_url() . '/woocommerce-warung-jne/uploads/example.csv'; ?>"
+                            data-tip="Download contoh file data kota"
+                            target="_blank">Download contoh</a>.
+                    </p>
                 <?php } ?>
             </td>
         </tr>
@@ -217,6 +222,8 @@ abstract class WC_Warung_Base extends WC_Shipping_Method
             }
         }
         fclose($fd);
+
+        move_uploaded_file($upload_path, WP_PLUGIN_DIR . '/woocommerce-warung-jne/uploads/' . $this->id . '.csv');
 
         $jne_options['cost_data'] = $cities_cost;
         $jne_options['city_count'] = $city_counter;
@@ -251,7 +258,7 @@ abstract class WC_Warung_Base extends WC_Shipping_Method
     private function get_total_weight()
     {
         $woocommerce = wc();
-        $default_weight = isset($this->settings['default_weight'])?$this->settings['default_weight']:1;
+        $default_weight = isset($this->settings['default_weight']) ? $this->settings['default_weight'] : 1;
         $total_weight = 0;
 
         if (sizeof($woocommerce->cart->cart_contents) > 0) {
