@@ -112,20 +112,18 @@ function warung_shipping_ajax_action_callback() {
     // query
     $q = strtoupper($_POST['q']);
     $limit = 35;
-
+    
     // optional params
     $isCalculatorMode = $_POST['m'] == 'calc';
-
-
+    
     // Use JNE AS DEFAULT
-    $shipping_cities = get_option( 'woocommerce_warung_shipping_jne_reguler_shipping_data' );
+    $shipping_cities = get_option( 'woocommerce_warung_shipping_jne_reguler_shipping_rate' );
     if(isset($shipping_cities) && isset($shipping_cities['cost_data'])) {asort($shipping_cities['cost_data']);}
-
     $new_states = array();
     if (!empty($q)) {
         if(is_array($shipping_cities['cost_data']) && count($shipping_cities['cost_data']) > 0){
             foreach($shipping_cities['cost_data'] as $key => $city){
-                if (strpos($city['city'], $q) !== false) {
+                if (strpos(strtoupper($city['city']), $q) !== false) {
                     $new_states[] = (object)array("text"=>$city['city'],"id"=>$city['city']);
                     if (count($new_states) >= $limit) break;
                 }
@@ -139,7 +137,7 @@ function warung_shipping_ajax_action_callback() {
             $weight = 1;
         }
 
-        // loop throug all shipping methods
+        // loop through all shipping methods
         global $woocommerce;
         $woocommerce->shipping->load_shipping_methods();
 
